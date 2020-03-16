@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"errors"
 	"fmt"
 	"os"
 
@@ -10,7 +11,7 @@ import (
 )
 
 func help() {
-	fmt.Println("dec input_file_address key_file_address output_file_address")
+	fmt.Println("dec input_file_address key_file_address output_file_address\tdcrypts the input file\ndec --help or dec -h\tshows this message")
 }
 
 func hash(data []byte) []byte {
@@ -34,13 +35,13 @@ func decrypt(data, pass []byte) []byte {
 }
 
 func main() {
+	BadCommand := errors.New("Bad command\nEnter \"dec --help\" or \"dec -h\" to see the instruction")
 	if len(os.Args) != 4 {
-		if len(os.Args) == 1 {
+		if len(os.Args) == 2 && (os.Args[1] == "--help" || os.Args[1] == "-h") {
 			help()
-		} else {
-			fmt.Println("commandoo ride")
+			os.Exit(1)
 		}
-		os.Exit(1)
+		panic(BadCommand)
 	}
 	//Open the file containing the string to be decrypted
 	inputFile, err := os.Open(os.Args[1])
