@@ -4,16 +4,18 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 
 	"golang.org/x/crypto/sha3"
 )
 
+const keylen = 32
+
 func help() {
-	fmt.Println("enc input_file_address key_length key_output_file_address")
+	fmt.Println("enc input_file_address key_output_file_address\tproduces encrypted file\nenc --help or enc -h\tshows this message")
 }
 
 func hash(data []byte) []byte {
@@ -36,20 +38,16 @@ func encrypt(data []byte, passphrase []byte) []byte {
 }
 
 func main() {
-	if len(os.Args) != 4 {
-		if len(os.Args) == 1 {
+	BadCommand := errors.New("Bad command\nEnter \"enc --help\" or \"enc -h\" to see the instruction")
+	if len(os.Args) != 3 {
+		if len(os.Args) == 2 && (os.Args[1] == "--help" || os.Args[1] == "-h") {
 			help()
-		} else {
-			fmt.Println("commandoo ride")
+			os.Exit(1)
 		}
-		os.Exit(1)
+		panic(BadCommand)
 	}
 	//Open the file containing the string
 	inputFile, err := os.Open(os.Args[1])
-	if err != nil {
-		panic(err.Error())
-	}
-	keylen, err := strconv.Atoi(os.Args[1])
 	if err != nil {
 		panic(err.Error())
 	}
